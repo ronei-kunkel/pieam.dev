@@ -1,13 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <link rel="icon" href="/favicon.ico">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PieAm</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="/favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- https://getbootstrap.com -->
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+  <!-- https://bootswatch.com/flatly/ -->
+  <link rel="stylesheet" href="/css/flatly.min.css">
+
+  <style>
+    #g_a11y_announcement {
+      display: none;
+    }
+  </style>
+
+  <title>Pieam.dev</title>
+</head>
+
+<body>
+
+  <!-- https://accounts.google.com/gsi/client -->
+  <script id="googleScript" src="/js/gsi.min.js" defer></script>
+
+  <div id="app"></div>
+  <script type="module" src="/src/main.ts"></script>
+
+  <!-- https://getbootstrap.com -->
+  <script src="/js/bootstrap.min.js" async></script>
+</body>
+
 </html>
