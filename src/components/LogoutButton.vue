@@ -27,17 +27,26 @@ const logout = async () => {
 </script>
 
 <template>
-  <button :class="loading ? 'leaving' : 'logout'" @click="logout" :disabled="loading">
+  <span :class="loading ? 'leaving' : 'logout'" @click="logout" :disabled="loading">
     {{ loading ? 'Leaving' : 'Logout' }}
-  </button>
+  </span>
 </template>
 
 <style scoped>
-button.leaving {
+span {
+  padding: .5rem;
+  border-radius: 5px;
+}
+
+span:hover {
+  background-color: gray;
+}
+
+span.leaving {
   cursor: progress;
 }
 
-button.logout {
+span.logout {
   cursor: pointer;
 }
 </style>

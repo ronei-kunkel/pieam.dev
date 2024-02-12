@@ -3,6 +3,8 @@ import { PieamApi } from "@/apis/PieamApi";
 
 export class SessionVerificationService {
 
+  pieamApi:PieamApi = new PieamApi();
+
   public async validSession() {
     const cookieService = new CookieService();
 
@@ -12,7 +14,7 @@ export class SessionVerificationService {
       return false;
     }
 
-    const sessionVerified = await new PieamApi().session();
+    const sessionVerified = await this.pieamApi.session();
 
     if (cookie === '1' && sessionVerified.status === 200) {
       return true;
