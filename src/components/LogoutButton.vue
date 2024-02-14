@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { pieamApiService } from '@/services/pieamApiService';
+import router from '@/router';
+import { PieamApi } from '@/apis/PieamApi';
 
 const loading = ref(false);
 
-const apiService = new pieamApiService();
+const pieamApi = new PieamApi();
 
-const fazerRequisicao = async () => {
+const logout = async () => {
   if (loading.value) {
     return;
   }
@@ -14,21 +15,29 @@ const fazerRequisicao = async () => {
   loading.value = true;
 
   try {
-    const apiResponse = await apiService.revokeAccess();
-    console.log(apiResponse.data);
+    const apiResponse = await pieamApi.logout();
+    console.log(apiResponse);
+    if (apiResponse.status === 200) {
+      router.replace({ name: 'login' });
+    }
   } catch (error) {
-    console.error('Erro na requisição:', error);
-  } finally {
     loading.value = false;
   }
 };
 </script>
 
 <template>
-  <button @click="fazerRequisicao" :disabled="loading">
-    {{ loading ? '...' : 'Faça logout' }}
-  </button>
+  <span :class="loading ? 'leaving' : 'logout'" @click="logout" :disabled="loading">
+    {{ loading ? 'Leaving' : 'Logout' }}
+  </span>
 </template>
 
 <style scoped>
+span.leaving {
+  cursor: progress;
+}
+
+span.logout {
+  cursor: pointer;
+}
 </style>
