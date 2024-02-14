@@ -1,29 +1,35 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onBeforeMount, onMounted, ref } from 'vue';
 import { PieamApi } from '@/apis/PieamApi';
 import { GoogleClientService } from '@/services/GoogleClientService';
-import { onMounted } from 'vue';
+import { SessionVerificationService } from '@/services/SessionVerificationService';
 import router from '@/router';
 
 const pieamApi = new PieamApi();
 const googleClient = new GoogleClientService();
+const sessionVerification = new SessionVerificationService();
 const clientId = googleClient.getClientId();
 
 const googleLoginBtn = ref(null);
 const maintenance = ref(false);
 
-interface CredentialResponse {
-  credential: string;
-}
-
-const handleCredentialResponse = async (credentialResponse: CredentialResponse) => {
-  const loginResponse = await pieamApi.login(credentialResponse.credential);
-  console.log(loginResponse);
-
-  if (loginResponse.status === 200) {
+onBeforeMount(() => {
+  console.log('verificando sessão antes de montar login');
+  if (sessionVerification.validateSession()) {
     router.replace({ name: 'home' });
   }
-}
+
+  if(!sessionVerification.validateSession()) {
+    pieamApi.getUserInfo().then((apiResponse) => {
+      if (apiResponse.status !== 401) {
+        router.replace({ name: 'home' });
+      }
+    }).catch(() => {
+      
+    })
+  }
+
+});
 
 onMounted(() => {
 
@@ -64,6 +70,25 @@ onMounted(() => {
 
 });
 
+interface CredentialResponse {
+  credential: string;
+}
+
+const handleCredentialResponse = (credentialResponse: CredentialResponse) => {
+
+  pieamApi.login(credentialResponse.credential).then((response) => {
+    if (response.status === 200) {
+      console.log(response.data);
+      // adicionar os dados retornados na sessão
+      router.replace({ name: 'home' });
+    } else {
+      // popup de erro ao fazer login
+    }
+  }).catch(() => {
+    // popup de erro ao fazer login
+  });
+}
+
 const h1 = 'Pieam.dev';
 const p = 'You stay logged for next 10 days';
 </script>
@@ -76,7 +101,7 @@ const p = 'You stay logged for next 10 days';
           <div class="card">
             <div class="row g-0">
               <div class="img col-md-6 col-lg-6 d-none d-md-block">
-                <img src="/images/maximalfocus-HakTxidk36I-unsplash.jpg"
+                <img src="@/assets/images/maximalfocus-HakTxidk36I-unsplash.jpg"
                   alt="Foto de <a href='https://unsplash.com/pt-br/@maximalfocus?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash'>Maximalfocus</a> na <a href='https://unsplash.com/pt-br/fotografias/ilustracao-da-luz-preta-e-vermelha-HakTxidk36I?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash'>Unsplash</a>"
                   class="img-fluid mt-1" loading="lazy" />
               </div>

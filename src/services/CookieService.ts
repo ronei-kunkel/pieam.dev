@@ -1,6 +1,6 @@
 export class CookieService {
 
-  cookies: Map<string, string>;
+  private cookies: Map<string, string>;
 
   constructor() {
     const cookies = new Map();

@@ -33,15 +33,6 @@ const logout = async () => {
 </template>
 
 <style scoped>
-span {
-  padding: .5rem;
-  border-radius: 5px;
-}
-
-span:hover {
-  background-color: gray;
-}
-
 span.leaving {
   cursor: progress;
 }

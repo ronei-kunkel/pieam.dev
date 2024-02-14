@@ -12,17 +12,17 @@ const req = axios.create({
 
 export class PieamApi {
 
-  cookeService: CookieService = new CookieService();
+  private cookeService: CookieService = new CookieService();
 
   public login(credential: string) {
     return req.post('/v1/auth/google', { "credential": credential });
   }
 
-  public async session() {
-    return await req.get('/v1/session');
-  }
-
   public logout() {
     return req.delete('/v1/auth', { data: { 'p_csrf_token': this.cookeService.getCookie('p_csrf_token') } });
+  }
+
+  public getUserInfo() {
+    return req.get('/v1/user/info');
   }
 };

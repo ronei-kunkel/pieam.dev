@@ -1,25 +1,18 @@
-import { CookieService } from "./CookieService";
 import { PieamApi } from "@/apis/PieamApi";
+import { CookieService } from "./CookieService";
 
 export class SessionVerificationService {
 
-  pieamApi:PieamApi = new PieamApi();
+  private cookieService: CookieService = new CookieService();
 
-  public async validSession() {
-    const cookieService = new CookieService();
+  public validateSession() {
 
-    const cookie = cookieService.getCookie('p_session_verification');
+    const cookie = this.cookieService.getCookie('p_session_verification');
 
-    if (cookie === '0' || cookie == undefined) {
+    if (cookie !== '1') {
       return false;
     }
 
-    const sessionVerified = await this.pieamApi.session();
-
-    if (cookie === '1' && sessionVerified.status === 200) {
-      return true;
-    }
-
-    return false;
+    return true;
   }
 }

@@ -36,7 +36,7 @@ router.beforeEach(async (to, from, next) => {
       next();
     } else {
 
-      const validSession = await new SessionVerificationService().validSession();
+      const validSession = await new SessionVerificationService().validateSession();
 
       if (!validSession) {
         next({ name: 'login' });

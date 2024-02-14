@@ -1,5 +1,42 @@
 <script setup lang="ts">
-import LogoutButtonVue from '@/components/LogoutButton.vue';
+import { PieamApi } from '@/apis/PieamApi';
+import LogoutButton from '@/components/LogoutButton.vue';
+import SideOffCanvasVue from '@/components/SideOffCanvas.vue';
+import router from '@/router';
+import { SessionVerificationService } from '@/services/SessionVerificationService';
+import { onBeforeMount, ref } from 'vue';
+
+const sessionVerification = new SessionVerificationService();
+const pieamApi = new PieamApi();
+
+const user = ref({
+  id: 0,
+  name: '',
+  last_name: '',
+  email: '',
+  image_url: ''
+});
+
+onBeforeMount(() => {
+  console.log('verificando sessão antes de montar home');
+
+  if (!sessionVerification.validateSession()) {
+    router.replace({ name: 'login' });
+  }
+
+  if(sessionVerification.validateSession()) {
+    pieamApi.getUserInfo().then((apiResponse) => {
+  
+      user.value = apiResponse.data
+      if (apiResponse.status === 401) {
+        router.replace({ name: 'login' });
+      }
+    }).catch(() => {
+      router.replace({ name: 'login' });
+    })
+  }
+});
+
 </script>
 
 <template>
@@ -10,36 +47,35 @@ import LogoutButtonVue from '@/components/LogoutButton.vue';
           aria-controls="offcanvasExample">
           <span class="navbar-toggler-icon primary"></span>
         </button>
-        <router-link class="navbar-brand" to="">
+        <!-- <router-link class="navbar-brand" to="">
           Pieam.dev
-        </router-link>
-        <div class="d-flex" id="navbarColor01">
-          <form class="d-flex">
-            <input class="form-control me-sm-2" type="search" placeholder="Search">
-            <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
-          </form>
+        </router-link> -->
+
+        <div class="btn-group">
+          <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown"
+            aria-expanded="false" data-bs-reference="parent">
+            <span class="visually-hidden">Toggle Dropdown</span>
+          </button>
+          <img class="user-image" :src="user.image_url" width="40">
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item disabled">Configuration</a></li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+            <li> <LogoutButton class="dropdown-item" /> </li>
+          </ul>
         </div>
       </div>
     </nav>
-    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
-      <div class="offcanvas-header">
-
-        <h5 class="offcanvas-title" id="offcanvasExampleLabel">Pieam.dev</h5>
-        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-      </div>
-      <div class="offcanvas-body">
-        <ul class="navbar-nav me-auto">
-          <li class="nav-item">
-            <router-link class="nav-link active" to="">
-              Home
-            </router-link>
-          </li>
-        </ul>
-        <hr>
-        <LogoutButtonVue />
-      </div>
-    </div>
+    <SideOffCanvasVue :user="user" />
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.user-image {
+  border-radius: 0 5px 5px 0;
+}
+.dropdown-menu {
+  margin-left: -6.5rem;
+}
+</style>
