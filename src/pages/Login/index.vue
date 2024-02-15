@@ -6,35 +6,57 @@ import { SessionVerificationService } from '@/services/SessionVerificationServic
 import router from '@/router';
 
 const pieamApi = new PieamApi();
-const googleClient = new GoogleClientService();
 const sessionVerification = new SessionVerificationService();
+
+if (sessionVerification.validateSession()) {
+  router.replace({ name: 'home' });
+} else {
+  pieamApi.getUserInfo().then((apiResponse) => {
+    if (apiResponse.status !== 401) {
+      router.replace({ name: 'home' });
+    }
+  }).catch(() => {
+    
+  })
+}
+
+const googleClient = new GoogleClientService();
 const clientId = googleClient.getClientId();
+
+interface CredentialResponse {
+  credential: string;
+}
+
+const handleCredentialResponse = (credentialResponse: CredentialResponse) => {
+
+  pieamApi.login(credentialResponse.credential).then((response) => {
+    if (response.status === 200) {
+      router.replace({ name: 'home' });
+    } else {
+      // popup de erro ao fazer login
+    }
+  }).catch(() => {
+    // popup de erro ao fazer login
+  });
+}
 
 const googleLoginBtn = ref(null);
 const maintenance = ref(false);
 
 onBeforeMount(() => {
-  console.log('verificando sessão antes de montar login');
-  if (sessionVerification.validateSession()) {
-    router.replace({ name: 'home' });
-  }
-
-  if(!sessionVerification.validateSession()) {
-    pieamApi.getUserInfo().then((apiResponse) => {
-      if (apiResponse.status !== 401) {
-        router.replace({ name: 'home' });
-      }
-    }).catch(() => {
-      
-    })
-  }
-
-});
-
-onMounted(() => {
 
   // @see /index.html
   const googleScript = document.getElementById('googleScript') as HTMLScriptElement;
+
+  googleScript.onerror = () => {
+    maintenance.value = true;
+  }
+  googleScript.onabort = () => {
+    maintenance.value = true;
+  }
+});
+
+onMounted(() => {
 
   // @ts-ignore
   const GoogleClient: any = window.google;
@@ -61,36 +83,8 @@ onMounted(() => {
     });
   }
 
-  googleScript.onerror = () => {
-    maintenance.value = true;
-  }
-  googleScript.onabort = () => {
-    maintenance.value = true;
-  }
 
 });
-
-interface CredentialResponse {
-  credential: string;
-}
-
-const handleCredentialResponse = (credentialResponse: CredentialResponse) => {
-
-  pieamApi.login(credentialResponse.credential).then((response) => {
-    if (response.status === 200) {
-      console.log(response.data);
-      // adicionar os dados retornados na sessão
-      router.replace({ name: 'home' });
-    } else {
-      // popup de erro ao fazer login
-    }
-  }).catch(() => {
-    // popup de erro ao fazer login
-  });
-}
-
-const h1 = 'Pieam.dev';
-const p = 'You stay logged for next 10 days';
 </script>
 
 <template>
@@ -108,13 +102,13 @@ const p = 'You stay logged for next 10 days';
               <div class="form col-md-6 col-lg-6 d-flex align-items-center">
                 <div class="card-body p-4 p-lg-5 text-black">
                   <div class="d-flex flex-column align-items-center mb-3 pb-1">
-                    <h1 class="h1 fw-bold mb-3">{{ h1 }}</h1>
+                    <h1 class="h1 fw-bold mb-3">Pieam.dev</h1>
 
                     <div :hidden="maintenance" ref="googleLoginBtn"></div>
 
                     <p :hidden="!maintenance">Disabled For Maintenance</p>
 
-                    <p class="text-secondary mt-1">{{ p }}</p>
+                    <p class="text-secondary mt-1">You stay logged for next 10 days</p>
                   </div>
                 </div>
               </div>
