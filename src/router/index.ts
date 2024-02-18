@@ -1,26 +1,30 @@
-import LoginPage from "@/pages/LoginPage.vue";
-import HomePage from "@/pages/HomePage.vue";
-import { createRouter, createWebHashHistory, type RouteRecordRaw, type RouterOptions } from "vue-router";
+import { createRouter, createWebHistory, type RouteRecordRaw, type RouterOptions } from "vue-router";
 import { SessionVerificationService } from "@/services/SessionVerificationService";
+
+const LoginPage = () => import('@/pages/Login/index.vue');
+const HomePage = () => import('@/pages/Home/index.vue');
 
 const routes: RouteRecordRaw[] = [
   {
     path: '/login',
     component: LoginPage,
     name: 'login',
+    meta: {
+      private: false
+    }
   },
   {
     path: '/',
     component: HomePage,
     name: 'home',
     meta: {
-      breadcrumb: 'Home'
+      private: true
     }
   }
 ];
 
 const options: RouterOptions = {
-  history: createWebHashHistory(),
+  history: createWebHistory('/'),
   routes: routes
 };
 
